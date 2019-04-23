@@ -20,18 +20,28 @@ namespace MyAzureFunctionOnDocker
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            //Parameter "name" is assigned from a GET request (getting it from the query request)
-            string name = req.Query["name"];
+            //Parameter "num" is assigned from a GET request (getting it from the query request)
+            string num = req.Query["num"];
 
             //Another block starts in order to get te same parameter from the POST request
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            num = num ?? data?.num;
 
-            //ends by returning the name.
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            //ends by returning the number.
+            return num != null
+                ? (ActionResult)new OkObjectResult(ValidarNumero(num))
+                : new BadRequestObjectResult("your number is not valid, check for mistakes in your typing - Remember it must have more than 8 numbers");
+        }
+
+        private static bool ValidarNumero(string num)
+        {            
+            int number = 0;
+            bool canConvert = int.TryParse(num, out number);
+            if (canConvert == true && num.Length > 8)
+                return ("number now = {0} and it's correct!", number);
+            else
+                return false;
         }
     }
 }
